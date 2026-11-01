@@ -21,7 +21,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Reconstruct and patch InGame Creator source
+      - name: Reconstruct exact InGame Creator source
         shell: bash
         run: |
           set -euo pipefail
@@ -30,8 +30,11 @@ jobs:
           unzip -q work/source.zip -d work/project
           test -f work/project/build.gradle
           test -f work/project/src/main/resources/fabric.mod.json
-          cat igc-build/031-inline-fix.part*.patch > work/031-inline-fix.patch
-          patch -d work/project -p1 < work/031-inline-fix.patch
+          cat igc-build/031-overlay.part*.b64 | base64 -d > work/031-overlay.tar.gz
+          tar -xzf work/031-overlay.tar.gz -C work/project
+          test -f work/project/src/main/java/dev/ingamecreator/core/blueprint/InlineNodeEditor.java
+          test -f work/project/src/main/java/dev/ingamecreator/core/blueprint/InlineEditSession.java
+          test -f work/project/src/main/java/dev/ingamecreator/core/ui/BlueprintInspectorLayout.java
           grep -q '^mod_version=0.3.1-beta$' work/project/gradle.properties
 
       - name: Set up Gradle 8.7
