@@ -1,0 +1,30 @@
+name: Extract IGC source for 0.3.1
+on:
+  push:
+    branches: [igc-build-031-temp]
+permissions:
+  contents: write
+jobs:
+  extract:
+    if: "!contains(github.event.head_commit.message, '[source-extracted]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf igc-src work
+          mkdir -p work igc-src
+          cat igc-build/source.part*.b64 | base64 -d > work/source.zip
+          unzip -q work/source.zip -d igc-src
+          test -f igc-src/build.gradle
+      - name: Commit extracted source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add igc-src
+          git commit -m "temp: extract IGC source [source-extracted]"
+          git push origin HEAD:igc-build-031-temp
