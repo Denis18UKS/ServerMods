@@ -1,0 +1,34 @@
+,ITEM_NAME,ITEM_DESCRIPTION,ITEM_MAX_STACK,ITEM_TEXTURE,ITEM_MODEL,BLOCK_ID,BLOCK_NAME,BLOCK_HARDNESS,BLOCK_RESISTANCE,BLOCK_LUMINANCE,BLOCK_TEXTURE,BLOCK_MODEL,TEXTURE_ID,TEXTURE_SIZE,TEXTURE_HEX,MODEL_ID,CUBE_NAME,CUBE_X,CUBE_Y,CUBE_Z,CUBE_W,CUBE_H,CUBE_D,CUBE_RX,CUBE_RY,CUBE_RZ,CUBE_TEXTURE,TRIGGER_ELEMENT,TRIGGER_EVENT,TRIGGER_BLUEPRINT}
+-    private record BlueprintGeometry(int x,int y,int w,int h,int inspectorW){}
++    private record BlueprintGeometry(int x,int y,int w,int h,int inspectorX,int inspectorY,int inspectorW,boolean inspectorOverlay){}
+     private record PortPoint(int x,int y){}
+     private record PortHit(UUID nodeId,PortDefinition port){}
+     private record PendingPort(UUID nodeId,String portId,PortDirection direction){}
+--- a/src/main/java/dev/ingamecreator/core/ui/BlueprintInspectorLayout.java
++++ b/src/main/java/dev/ingamecreator/core/ui/BlueprintInspectorLayout.java
+@@ -0,0 +1,25 @@
++package dev.ingamecreator.core.ui;
++
++public record BlueprintInspectorLayout(
++        int graphWidth,
++        int inspectorXOffset,
++        int inspectorYOffset,
++        int inspectorWidth,
++        boolean overlay) {
++
++    public static BlueprintInspectorLayout compute(int canvasWidth, boolean hasSelection) {
++        int width = Math.max(220, canvasWidth);
++        if (!hasSelection) return new BlueprintInspectorLayout(width, width, 0, 0, false);
++
++        if (width >= 620) {
++            int inspector = Math.min(230, width / 4);
++            inspector = Math.max(180, inspector);
++            int graph = Math.max(220, width - inspector - 8);
++            return new BlueprintInspectorLayout(graph, graph + 8, 0, inspector, false);
++        }
++
++        int inspector = Math.min(260, Math.max(180, width - 24));
++        int x = Math.max(8, width - inspector - 8);
++        return new BlueprintInspectorLayout(width, x, 8, inspector, true);
++    }
++}
