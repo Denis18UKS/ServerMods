@@ -1,0 +1,47 @@
+.ingamecreator.core.ui.BlueprintInspectorLayout;
+ import dev.ingamecreator.core.ui.CreatorLayout;
+ import dev.ingamecreator.core.ui.IdeSection;
+ import dev.ingamecreator.core.ui.IdeState;
+@@ -112,6 +114,7 @@
+     private double lastMouseY;
+     private PendingPort pendingPort;
+     private InlineEditSession inlineEdit;
++    private UUID roleDropdownNode;
+     private boolean selectingBox;
+     private double boxStartX, boxStartY, boxEndX, boxEndY;
+     private final Deque<String> undo = new ArrayDeque<>();
+@@ -330,9 +333,9 @@
+         if (primarySelectedNode == null || state.activeGraph().nodes().get(primarySelectedNode) == null || g.inspectorW() <= 0) return;
+         BlueprintNode node = state.activeGraph().nodes().get(primarySelectedNode);
+         NodeType type = type(node.typeId());
+-        int x = g.x() + g.w() + 8, y = g.y();
++        int x = g.inspectorX(), y = g.inspectorY();
+         int w = g.inspectorW();
+-        c.fill(x, y, x + w, Math.min(l.contentBottom(), y + 146), 0xF21A2432);
++        c.fill(x, y, x + w, Math.min(l.contentBottom(), y + 146), g.inspectorOverlay() ? 0xFA1A2432 : 0xF21A2432);
+         c.fill(x, y, x + 3, Math.min(l.contentBottom(), y + 146), ACCENT_2);
+         c.drawText(textRenderer, "NODE INSPECTOR", x + 10, y + 9, TEXT, true);
+         c.drawText(textRenderer, fit(type == null ? node.typeId() : type.title(), w - 20), x + 10, y + 24, ACCENT, false);
+@@ -568,6 +571,7 @@
+             for (int i = 0; i < ins.size(); i++) drawPort(c, node, ins.get(i), i, g, nw, true);
+             for (int i = 0; i < outs.size(); i++) drawPort(c, node, outs.get(i), i, g, nw, false);
+         }
++        renderRoleDropdown(c, g);
+     }
+ 
+     private void renderInlineNodeEditor(DrawContext c, BlueprintNode node, BlueprintGeometry g, int nw) {
+@@ -579,7 +583,30 @@
+         if (editing) shown = shown + "|";
+         c.fill(fx, fy, fx + fw, fy + fh, 0xFF101822);
+         c.fill(fx, fy + fh - 1, fx + fw, fy + fh, editing ? ACCENT_2 : BORDER);
+-        c.drawText(textRenderer, fit(shown, fw - scaled(12)), fx + scaled(6), fy + Math.max(3, scaled(6)), value.isEmpty() && !editing ? 0xFF66758B : TEXT, false);
++        int reserved = "value.role".equals(node.typeId()) ? scaled(24) : scaled(12);
++        c.drawText(textRenderer, fit(shown, fw - reserved), fx + scaled(6), fy + Math.max(3, scaled(6)), value.isEmpty() && !editing ? 0xFF66758B : TEXT, false);
++        if ("value.role".equals(node.typeId())) {
++            int ax = fx + fw - scaled(18);
++            c.fill(ax, fy, fx + fw, fy + fh - 1, roleDropdownNode != null && roleDropdownNode.equals(node.id()) ? 0xFF294A54 : 0xFF182635);
++            c.drawText(textRenderer, "▼", ax + Math.max(2, scaled(4)), fy + Math.max(3, scaled(5)), ACCENT_2, false);
++        }
++    }
++
++    private void rend
