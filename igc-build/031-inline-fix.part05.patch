@@ -1,0 +1,37 @@
+ null) loadInspector(updated);
++                saveGraph("Role value saved: " + roleChoice);
++            } catch (Exception e) { status = "Role value error: " + shortMessage(e); }
++            return true;
++        }
+         BlueprintNode inlineNode = findInlineEditorNode(mx, my, g);
+         if (inlineNode != null && button == 0) {
++            if ("value.role".equals(inlineNode.typeId()) && roleDropdownArrowHit(mx, my, inlineNode, g)) {
++                selectSingle(inlineNode); activeField = ActiveField.NONE; inlineEdit = null;
++                roleDropdownNode = inlineNode.id().equals(roleDropdownNode) ? null : inlineNode.id();
++                return true;
++            }
++            roleDropdownNode = null;
++            if ("value.boolean".equals(inlineNode.typeId())) {
++                try {
++                    recordHistory();
++                    boolean current = Boolean.parseBoolean(InlineNodeEditor.value(inlineNode));
++                    InlineNodeEditor.apply(state.activeGraph(), inlineNode.id(), Boolean.toString(!current));
++                    loadInspector(state.activeGraph().nodes().get(inlineNode.id()));
++                    saveGraph("Boolean value: " + !current);
++                } catch (Exception e) { status = "Boolean value error: " + shortMessage(e); }
++                return true;
++            }
+             if (inlineEdit == null || !inlineEdit.nodeId().equals(inlineNode.id())) startInlineEdit(inlineNode);
+             return true;
+         }
++        roleDropdownNode = null;
+         if (inlineEdit != null && button == 0 && !commitInlineEdit()) return true;
+         PortHit port = findPort(mx, my, g);
+         if (port != null && button == 0) { handlePortClick(port); return true; }
+@@ -996,8 +1053,8 @@
+ 
+     private void selectSingle(BlueprintNode node){selectedNodes.clear();selectedNodes.add(node.id());primarySelectedNode=node.id();loadInspector(node);}
+     private void toggleSelection(BlueprintNode node){if(!selectedNodes.add(node.id()))selectedNodes.remove(node.id());primarySelectedNode=selectedNodes.contains(node.id())?node.id():selectedNodes.stream().findFirst().orElse(null);if(primarySelectedNode!=null)loadInspector(state.activeGraph().nodes().get(primarySelectedNode));}
+-    private void clearSelection(){selectedNodes.clear();primarySelectedNode=null;pendingPort=null;inlineEdit=null;}
+-    private void loadInspector(BlueprintNode node){if(node==null)return;String preferred=switch(node.typeId()){case "value.text","value.role"->"value";case "function.call"->"function";case "chat.send"->"text";default->node.properties().keySet().stream().findFirst().orElse("value");};nodePropertyKey=preferred;nodePropertyValue=node.properties().getOrDefault(preferred,"");}
++    private void clearSelection(){selectedNodes.clear();
