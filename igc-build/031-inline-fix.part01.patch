@@ -1,0 +1,44 @@
+ormalizeNumber(value);
++            case "value.boolean" -> normalizeBoolean(value);
++            case "value.item", "value.block", "value.command" -> value.trim();
++            default -> throw new IllegalArgumentException("node is not inline editable: " + typeId);
++        };
++    }
++
++    private static String normalizeNumber(String value) {
++        String trimmed = value.trim();
++        if (trimmed.isEmpty()) return "";
++        try {
++            BigDecimal decimal = new BigDecimal(trimmed).stripTrailingZeros();
++            double finiteCheck = decimal.doubleValue();
++            if (!Double.isFinite(finiteCheck)) throw new IllegalArgumentException("number must be finite");
++            return decimal.toPlainString();
++        } catch (NumberFormatException e) {
++            throw new IllegalArgumentException("invalid number: " + value, e);
++        }
++    }
++
++    private static String normalizeBoolean(String value) {
++        String normalized = value.trim().toLowerCase(Locale.ROOT);
++        return switch (normalized) {
++            case "true", "1", "yes", "on" -> "true";
++            case "false", "0", "no", "off", "" -> "false";
++            default -> throw new IllegalArgumentException("boolean must be true or false");
++        };
+     }
+ }
+--- a/src/main/java/dev/ingamecreator/core/blueprint/SmartNodeCatalog.java
++++ b/src/main/java/dev/ingamecreator/core/blueprint/SmartNodeCatalog.java
+@@ -78,6 +78,11 @@
+                 in("exec", "Exec", PortType.EXEC), in("player", "Player", PortType.PLAYER), in("text", "Text", PortType.TEXT), out("then", "Then", PortType.EXEC)));
+         nodes.add(node("value.text", "Text", "Text", "Text literal", out("value", "Value", PortType.TEXT)));
+         nodes.add(node("value.role", "Role", "Roles & Permissions", "Role literal", out("value", "Role", PortType.ROLE)));
++        nodes.add(node("value.number", "Number", "Values", "Number literal", out("value", "Number", PortType.NUMBER)));
++        nodes.add(node("value.boolean", "Boolean", "Values", "Boolean literal", out("value", "Boolean", PortType.BOOLEAN)));
++        nodes.add(node("value.item", "Item", "Items", "Runtime item id literal", out("value", "Item", PortType.ITEM)));
++        nodes.add(node("value.block", "Block", "Blocks", "Runtime block id literal", out("value", "Block", PortType.BLOCK)));
++        nodes.add(node("value.command", "Command", "Commands", "Command text literal", out("value", "Command", PortType.TEXT)));
+         nodes.add(node("function.call", "Call Function", "Functions", "Calls a user-defined Blueprint function",
+                 in("exec", "Exec", PortType.EXEC), out("then", "Then", PortType.EXEC), out("result", "Result", PortType.ANY)));
+         return new SmartNodeCatalog(nodes);
+--- a/src/main/java/dev/ingamecreator/core
