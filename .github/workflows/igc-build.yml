@@ -1,9 +1,9 @@
-name: Build InGame Creator 0.3.0-beta
+name: Build InGame Creator 0.3.1-beta
 
 on:
   push:
     branches:
-      - igc-build-030-temp
+      - igc-build-031-temp
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Reconstruct InGame Creator source
+      - name: Reconstruct and patch InGame Creator source
         shell: bash
         run: |
           set -euo pipefail
@@ -30,6 +30,9 @@ jobs:
           unzip -q work/source.zip -d work/project
           test -f work/project/build.gradle
           test -f work/project/src/main/resources/fabric.mod.json
+          cat igc-build/031-inline-fix.part*.patch > work/031-inline-fix.patch
+          patch -d work/project -p1 < work/031-inline-fix.patch
+          grep -q '^mod_version=0.3.1-beta$' work/project/gradle.properties
 
       - name: Set up Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
@@ -54,7 +57,7 @@ jobs:
       - name: Upload installable Fabric JAR
         uses: actions/upload-artifact@v4
         with:
-          name: ingame-creator-0.3.0-beta-fabric-1.20.1
+          name: ingame-creator-0.3.1-beta-fabric-1.20.1
           path: ready/*.jar
           if-no-files-found: error
           retention-days: 7
