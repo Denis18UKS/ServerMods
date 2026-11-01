@@ -1,0 +1,48 @@
+/runtime/BlueprintExecutor.java
++++ b/src/main/java/dev/ingamecreator/core/runtime/BlueprintExecutor.java
+@@ -168,10 +168,30 @@
+                         if (!"roles".equals(portId)) throw invalidOutput(node, portId);
+                         yield context.roles().roles();
+                     }
+-                    case "value.text", "value.role" -> {
++                    case "value.text", "value.role", "value.item", "value.block", "value.command" -> {
+                         if (!"value".equals(portId)) throw invalidOutput(node, portId);
+                         yield node.properties().getOrDefault("value", "");
+                     }
++                    case "value.number" -> {
++                        if (!"value".equals(portId)) throw invalidOutput(node, portId);
++                        String raw = node.properties().getOrDefault("value", "").trim();
++                        try {
++                            double number = Double.parseDouble(raw);
++                            if (!Double.isFinite(number)) throw new NumberFormatException("not finite");
++                            yield number;
++                        } catch (NumberFormatException failure) {
++                            throw new ExecutionFailure("invalid number literal: " + raw);
++                        }
++                    }
++                    case "value.boolean" -> {
++                        if (!"value".equals(portId)) throw invalidOutput(node, portId);
++                        String raw = node.properties().getOrDefault("value", "false").trim().toLowerCase(java.util.Locale.ROOT);
++                        yield switch (raw) {
++                            case "true", "1", "yes", "on" -> true;
++                            case "false", "0", "no", "off", "" -> false;
++                            default -> throw new ExecutionFailure("invalid boolean literal: " + raw);
++                        };
++                    }
+                     case "function.call" -> {
+                         if (!"result".equals(portId)) throw invalidOutput(node, portId);
+                         String function = node.properties().getOrDefault("function", node.properties().getOrDefault("name", ""));
+--- a/src/main/java/dev/ingamecreator/client/CreatorIdeScreen.java
++++ b/src/main/java/dev/ingamecreator/client/CreatorIdeScreen.java
+@@ -1,5 +1,6 @@
+ package dev.ingamecreator.client;
+ 
++import dev.ingamecreator.InGameCreatorMod;
+ import dev.ingamecreator.core.blueprint.BlueprintEdge;
+ import dev.ingamecreator.core.blueprint.BlueprintNode;
+ import dev.ingamecreator.core.blueprint.InlineEditSession;
+@@ -14,6 +15,7 @@
+ import dev.ingamecreator.core.content.TextureAsset;
+ import dev.ingamecreator.core.content.TriggerBinding;
+ import dev.ingamecreator.core.project.CreatorProject;
++import dev
