@@ -1,0 +1,46 @@
+erRoleDropdown(DrawContext c, BlueprintGeometry g) {
++        if (roleDropdownNode == null) return;
++        BlueprintNode node = state.activeGraph().nodes().get(roleDropdownNode);
++        if (node == null || !"value.role".equals(node.typeId())) { roleDropdownNode = null; return; }
++        List<String> choices = roleChoices();
++        int nx = nodeScreenX(node, g), ny = nodeScreenY(node, g), nw = scaled(180);
++        int x = nx + scaled(8), y = ny + scaled(51), w = nw - scaled(16), row = Math.max(16, scaled(18));
++        int visible = Math.min(10, choices.size());
++        c.fill(x - 1, y - 1, x + w + 1, y + visible * row + 1, ACCENT_2);
++        c.fill(x, y, x + w, y + visible * row, 0xFF101822);
++        for (int i = 0; i < visible; i++) {
++            int ry = y + i * row;
++            if (i > 0) c.fill(x, ry, x + w, ry + 1, BORDER);
++            c.drawText(textRenderer, fit(choices.get(i), w - scaled(12)), x + scaled(6), ry + Math.max(3, scaled(5)), TEXT, false);
++        }
+     }
+ 
+     private void drawPort(DrawContext c, BlueprintNode node, PortDefinition port, int index, BlueprintGeometry g, int nw, boolean input) {
+@@ -724,13 +751,14 @@
+ 
+         BlueprintGeometry g = blueprintGeometry(l);
+         if (primarySelectedNode != null && g.inspectorW() > 0) {
+-            int ix = g.x() + g.w() + 8, iy = g.y(), iw = g.inspectorW();
++            int ix = g.inspectorX(), iy = g.inspectorY(), iw = g.inspectorW();
+             if (inside(mx, my, ix + 10, iy + 50, iw - 20, 22)) { activeField = ActiveField.NODE_PROPERTY_KEY; return true; }
+             if (inside(mx, my, ix + 10, iy + 88, Math.max(70, iw - 100), 22)) { activeField = ActiveField.NODE_PROPERTY_VALUE; return true; }
+             if (inside(mx, my, ix + iw - 82, iy + 88, 72, 22)) {
+                 try { recordHistory(); state.activeGraph().setNodeProperty(primarySelectedNode, nodePropertyKey, nodePropertyValue); saveGraph("Node property saved: " + nodePropertyKey); }
+                 catch (Exception e) { status = "Property error: " + shortMessage(e); } return true;
+             }
++            if (g.inspectorOverlay() && inside(mx, my, ix, iy, iw, 146)) return true;
+         }
+ 
+         List<NodeType> palette = state.searchNodes(nodeSearch);
+@@ -745,11 +773,40 @@
+         }
+ 
+         if (!inside(mx, my, g.x(), g.y(), g.w(), g.h())) return false;
++        String roleChoice = findRoleDropdownChoice(mx, my, g);
++        if (roleChoice != null && button == 0) {
++            try {
++                recordHistory();
++                InlineNodeEditor.apply(state.activeGraph(), roleDropdownNode, roleChoice);
++                BlueprintNode updated = state.activeGraph().nodes().get(roleDropdownNode);
++                roleDropdownNode = null; inlineEdit = null;
++                if (updated !=
