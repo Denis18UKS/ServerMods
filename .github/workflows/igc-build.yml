@@ -1,0 +1,60 @@
+name: Build InGame Creator 0.3.0-beta
+
+on:
+  push:
+    branches:
+      - igc-build-030-temp
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout temporary build branch
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Reconstruct InGame Creator source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/project
+          cat igc-build/source.part*.b64 | base64 -d > work/source.zip
+          unzip -q work/source.zip -d work/project
+          test -f work/project/build.gradle
+          test -f work/project/src/main/resources/fabric.mod.json
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Loom build and remap
+        working-directory: work/project
+        run: gradle --no-daemon clean build
+
+      - name: Collect installable JAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ready
+          find work/project/build/libs -maxdepth 1 -type f -name '*.jar' \
+            ! -name '*sources*' ! -name '*dev*' ! -name '*NAMED*' \
+            -exec cp {} ready/ \;
+          test -n "$(find ready -maxdepth 1 -type f -name '*.jar' -print -quit)"
+          ls -lh ready
+
+      - name: Upload installable Fabric JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingame-creator-0.3.0-beta-fabric-1.20.1
+          path: ready/*.jar
+          if-no-files-found: error
+          retention-days: 7
