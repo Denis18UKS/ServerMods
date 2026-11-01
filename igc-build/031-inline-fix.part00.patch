@@ -1,0 +1,67 @@
+--- a/src/main/java/dev/ingamecreator/core/blueprint/InlineNodeEditor.java
++++ b/src/main/java/dev/ingamecreator/core/blueprint/InlineNodeEditor.java
+@@ -2,23 +2,47 @@
+ 
+ import dev.ingamecreator.core.roles.RoleService;
+ 
++import java.math.BigDecimal;
++import java.util.Locale;
+ import java.util.UUID;
+ 
+ public final class InlineNodeEditor {
+     private InlineNodeEditor() {}
+ 
+     public static boolean supports(String typeId) {
+-        return "value.role".equals(typeId) || "value.text".equals(typeId);
++        return switch (typeId == null ? "" : typeId) {
++            case "value.role", "value.text", "value.number", "value.boolean",
++                 "value.item", "value.block", "value.command" -> true;
++            default -> false;
++        };
+     }
+ 
+     public static String placeholder(String typeId) {
+-        return switch (typeId) {
++        return switch (typeId == null ? "" : typeId) {
+             case "value.role" -> "role name";
+             case "value.text" -> "text";
++            case "value.number" -> "0";
++            case "value.boolean" -> "false";
++            case "value.item" -> "item id";
++            case "value.block" -> "block id";
++            case "value.command" -> "command";
+             default -> "";
+         };
+     }
+ 
++    public static String label(String typeId) {
++        return switch (typeId == null ? "" : typeId) {
++            case "value.role" -> "role";
++            case "value.text" -> "text";
++            case "value.number" -> "number";
++            case "value.boolean" -> "boolean";
++            case "value.item" -> "item";
++            case "value.block" -> "block";
++            case "value.command" -> "command";
++            default -> "value";
++        };
++    }
++
+     public static String value(BlueprintNode node) {
+         if (node == null || !supports(node.typeId())) return "";
+         return node.properties().getOrDefault("value", "");
+@@ -29,8 +53,40 @@
+         BlueprintNode node = graph.nodes().get(nodeId);
+         if (node == null) throw new IllegalArgumentException("missing node: " + nodeId);
+         if (!supports(node.typeId())) throw new IllegalArgumentException("node is not inline editable: " + node.typeId());
++        graph.setNodeProperty(nodeId, "value", normalize(node.typeId(), rawValue));
++    }
++
++    public static String normalize(String typeId, String rawValue) {
+         String value = rawValue == null ? "" : rawValue;
+-        if ("value.role".equals(node.typeId())) value = RoleService.normalizeRoleName(value);
+-        graph.setNodeProperty(nodeId, "value", value);
++        return switch (typeId) {
++            case "value.role" -> value.isBlank() ? "" : RoleService.normalizeRoleName(value);
++            case "value.text" -> value;
++            case "value.number" -> n
