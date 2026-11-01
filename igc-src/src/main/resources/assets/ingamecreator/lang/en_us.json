@@ -1,0 +1,12 @@
+{
+  "itemGroup.ingamecreator.creator_tools": "InGame Creator",
+  "item.ingamecreator.creator_tablet": "Creator Tablet",
+  "item.ingamecreator.blueprint_chip": "Blueprint Chip",
+  "item.ingamecreator.command_token": "Command Token",
+  "item.ingamecreator.role_badge": "Role Badge",
+  "item.ingamecreator.runtime_item": "Runtime Item",
+  "category.ingamecreator": "InGame Creator",
+  "key.ingamecreator.open_creator": "Open Creator",
+  "block.ingamecreator.runtime_block": "Runtime Block",
+  "item.ingamecreator.runtime_block": "Runtime Block"
+}

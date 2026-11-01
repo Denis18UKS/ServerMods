@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "ingamecreator:block/runtime_block" }
+  }
+}

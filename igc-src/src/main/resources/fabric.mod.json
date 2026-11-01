@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "ingamecreator",
+  "version": "${version}",
+  "name": "InGame Creator",
+  "description": "In-game visual mod creator / Blueprint IDE for Fabric 1.20.1.",
+  "authors": ["Denis Karpov", "OpenAI"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.ingamecreator.InGameCreatorMod"],
+    "client": ["dev.ingamecreator.client.InGameCreatorClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "=1.20.1",
+    "java": ">=17",
+    "fabric-api": ">=0.92.12+1.20.1"
+  }
+}
