@@ -1,0 +1,19 @@
+ll;int index=Math.min(visible-1,Math.max(0,(my-y)/row));return choices.get(index);}
++    private List<String> roleChoices(){LinkedHashSet<String> roles=new LinkedHashSet<>(List.of("default","coder","admin","moderator","developer","tester","vip"));try{roles.addAll(InGameCreatorMod.roles().roles());}catch(RuntimeException ignored){}return List.copyOf(roles);}
++    private void startInlineEdit(BlueprintNode node){try{selectSingle(node);activeField=ActiveField.NONE;roleDropdownNode=null;inlineEdit=InlineEditSession.begin(state.activeGraph(),node.id());status="Editing "+InlineNodeEditor.label(node.typeId())+" value — Enter to save, Esc to cancel";}catch(Exception e){status="Inline edit error: "+shortMessage(e);}}
+     private boolean commitInlineEdit(){if(inlineEdit==null)return true;try{recordHistory();UUID id=inlineEdit.nodeId();inlineEdit.commit(state.activeGraph());BlueprintNode updated=state.activeGraph().nodes().get(id);inlineEdit=null;if(updated!=null)loadInspector(updated);saveGraph("Inline value saved");return true;}catch(Exception e){status="Invalid value: "+shortMessage(e);return false;}}
+ 
+     private NodeType type(String id){return state.searchNodes("").stream().filter(t->t.id().equals(id)).findFirst().orElse(null);}
+@@ -1027,7 +1087,7 @@
+     private int nodeScreenY(BlueprintNode node,BlueprintGeometry g){return(int)Math.round(g.y()+panY+node.y()*zoom);}
+     private int scaled(int value){return Math.max(1,(int)Math.round(value*zoom));}
+ 
+-    private BlueprintGeometry blueprintGeometry(CreatorLayout l){int inspector=(l.canvasWidth()>=620&&primarySelectedNode!=null)?Math.min(230,l.canvasWidth()/4):0;int gap=inspector>0?8:0;int w=Math.max(220,l.canvasWidth()-inspector-gap);return new BlueprintGeometry(l.canvasX(),l.contentTop(),w,l.canvasHeight(),inspector);}
++    private BlueprintGeometry blueprintGeometry(CreatorLayout l){BlueprintInspectorLayout inspector=BlueprintInspectorLayout.compute(l.canvasWidth(),primarySelectedNode!=null);return new BlueprintGeometry(l.canvasX(),l.contentTop(),inspector.graphWidth(),l.canvasHeight(),l.canvasX()+inspector.inspectorXOffset(),l.contentTop()+inspector.inspectorYOffset(),inspector.inspectorWidth(),inspector.overlay());}
+     private CreatorLayout layout(){return CreatorLayout.compute(Math.max(width,320),Math.max(height,200));}
+ 
+     private void clearBlueprintUi(){clearSelection();undo.clear();redo.clear();panX=panY=0;zoom=0.85;}
+@@ -1058,7 +1118,7 @@
+ 
+     private enum ElementMode{ITEMS("Items"),BLOCKS("Blocks"),TEXTURES("Textures"),MODELS("3D Models"),TRIGGERS("Triggers");private final String label;ElementMode(String label){this.label=label;}}
+     private enum ActiveField{NONE,PROJECT_ID,PROJECT_NAME,COMMAND_NAME,COMMAND_ROLE,BLUEPRINT_NAME,NODE_SEARCH,NODE_PROPERTY_KEY,NODE_PROPERTY_VALUE,ITEM_ID
