@@ -1,9 +1,9 @@
-name: Build InGame Creator 0.3.1-beta
+name: Build InGame Creator 0.3.2-beta
 
 on:
   push:
     branches:
-      - igc-build-031-temp
+      - igc-build-032-temp
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Reconstruct exact InGame Creator source
+      - name: Reconstruct exact InGame Creator 0.3.2 source
         shell: bash
         run: |
           set -euo pipefail
@@ -30,13 +30,19 @@ jobs:
           unzip -q work/source.zip -d work/project
           test -f work/project/build.gradle
           test -f work/project/src/main/resources/fabric.mod.json
+
           cat igc-build/031-overlay.part*.b64 | base64 -d > work/031-overlay.tar.gz
           tar -xzf work/031-overlay.tar.gz -C work/project
-          sed -i 's/^mod_version=.*/mod_version=0.3.1-beta/' work/project/gradle.properties
-          test -f work/project/src/main/java/dev/ingamecreator/core/blueprint/InlineNodeEditor.java
-          test -f work/project/src/main/java/dev/ingamecreator/core/blueprint/InlineEditSession.java
-          test -f work/project/src/main/java/dev/ingamecreator/core/ui/BlueprintInspectorLayout.java
-          grep -q '^mod_version=0.3.1-beta$' work/project/gradle.properties
+
+          cat igc-build/032-overlay.part*.b64 | base64 -d > work/032-overlay.tar.gz
+          tar -xzf work/032-overlay.tar.gz -C work/project
+
+          sed -i 's/^mod_version=.*/mod_version=0.3.2-beta/' work/project/gradle.properties
+          grep -q '^mod_version=0.3.2-beta$' work/project/gradle.properties
+          test -f work/project/src/main/java/dev/ingamecreator/core/content/TextureEditSession.java
+          test -f work/project/src/main/java/dev/ingamecreator/core/content/TextureLibraryService.java
+          test -f work/project/src/main/java/dev/ingamecreator/core/ui/TextEditBuffer.java
+          test -f work/project/src/main/java/dev/ingamecreator/core/ui/ScrollWindow.java
 
       - name: Set up Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
@@ -61,7 +67,7 @@ jobs:
       - name: Upload installable Fabric JAR
         uses: actions/upload-artifact@v4
         with:
-          name: ingame-creator-0.3.1-beta-fabric-1.20.1
+          name: ingame-creator-0.3.2-beta-fabric-1.20.1
           path: ready/*.jar
           if-no-files-found: error
           retention-days: 7
