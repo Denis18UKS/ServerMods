@@ -1,0 +1,46 @@
+name: Build GuessTheSpeedrunner Fabric 1.20.1
+
+on:
+  push:
+    branches:
+      - build/guess-the-speedrunner-1201
+    paths:
+      - ".github/workflows/build-guessspeedrunner.yml"
+      - "guess-the-speedrunner/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fabric-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout build branch
+        uses: actions/checkout@v4
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Extract source project
+        run: |
+          base64 -d guess-the-speedrunner/source.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
+          test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
+          test -f guess-the-speedrunner/build.gradle
+      - name: Build Fabric mod
+        working-directory: guess-the-speedrunner
+        run: gradle --no-daemon --stacktrace clean build
+      - name: Upload mod and source jars
+        uses: actions/upload-artifact@v4
+        with:
+          name: GuessTheSpeedrunner-Fabric-1.20.1
+          path: |
+            guess-the-speedrunner/build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 30
