@@ -33,7 +33,8 @@ jobs:
           base64 -d guess-the-speedrunner/source.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.3.0.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.3.1.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          grep -q 'mod_version=0.3.1' guess-the-speedrunner/gradle.properties
+          base64 -d guess-the-speedrunner/patch-0.3.2.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
+          grep -q 'mod_version=0.3.2' guess-the-speedrunner/gradle.properties
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
       - name: Build Fabric mod
@@ -42,7 +43,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.3.1
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.3.2
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
