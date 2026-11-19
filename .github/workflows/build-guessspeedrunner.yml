@@ -35,7 +35,7 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.3.1.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.3.2.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.3.3.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          rm -f guess-the-speedrunner/src/main/java/dev/zunserz/gts/mixin/PlayerEntityMixin.java
+          rm -f guess-the-speedrunner/src/main/java/dev/zunserz/gts/mixin/PlayerEntityMixin.java guess-the-speedrunner/src/main/java/dev/zunserz/gts/mixin/CreativeInventoryScreenMixin.java
           grep -q 'mod_version=0.3.3' guess-the-speedrunner/gradle.properties
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
