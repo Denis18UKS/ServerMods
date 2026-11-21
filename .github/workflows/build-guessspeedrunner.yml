@@ -52,7 +52,11 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.6.3-extra.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.6.3-glasses.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.6.3-dev-gui.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          grep -q 'mod_version=0.6.3' guess-the-speedrunner/gradle.properties
+          # Build the 0.6.4 hotfix on top of 0.6.3: real XP, Craft, recipe lock and coder trigger wand.
+          base64 -d guess-the-speedrunner/patch-0.6.4-git.diff.xz.b64 | xz -d > /tmp/gts-0.6.4.patch
+          git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.4.patch
+          git apply --directory=guess-the-speedrunner /tmp/gts-0.6.4.patch
+          grep -q 'mod_version=0.6.4' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -62,7 +66,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.3
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.4
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
