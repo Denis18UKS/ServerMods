@@ -56,7 +56,9 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.6.4-git.diff.xz.b64 | xz -d > /tmp/gts-0.6.4.patch
           git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.4.patch
           git apply --directory=guess-the-speedrunner /tmp/gts-0.6.4.patch
-          grep -q 'mod_version=0.6.4' guess-the-speedrunner/gradle.properties
+          # Apply v0.6.5 to the reconstructed v0.6.4 sources.
+          (cd guess-the-speedrunner && python apply-0.6.5.py)
+          grep -q 'mod_version=0.6.5' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -66,7 +68,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.4
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.5
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
