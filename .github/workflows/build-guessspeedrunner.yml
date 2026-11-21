@@ -60,7 +60,11 @@ jobs:
           (cd guess-the-speedrunner && python apply-0.6.5.py)
           # v0.6.6: refresh trigger UI in-place, persist volumes and make CODER outlines visible.
           base64 -d guess-the-speedrunner/patch-0.6.6.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          grep -q 'mod_version=0.6.6' guess-the-speedrunner/gradle.properties
+          # 0.6.7: process FALL zones for CODER during testing, swept collision and checkpoint markers.
+          base64 -d guess-the-speedrunner/patch-0.6.7.diff.xz.b64 | xz -dc > /tmp/gts-0.6.7.diff
+          git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.7.diff
+          git apply --directory=guess-the-speedrunner /tmp/gts-0.6.7.diff
+          grep -q 'mod_version=0.6.7' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -70,7 +74,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.6
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.7
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
