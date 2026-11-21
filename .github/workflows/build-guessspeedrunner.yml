@@ -74,7 +74,15 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.6.9.diff.xz.b64 | xz -dc > /tmp/gts-0.6.9.diff
           git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.9.diff
           git apply --directory=guess-the-speedrunner /tmp/gts-0.6.9.diff
-          grep -q 'mod_version=0.6.9' guess-the-speedrunner/gradle.properties
+          # 0.6.10: original IMBA tool textures, persistent restoration library,
+          # customizable Craft duration/brewing and reliable fake avatar scene TP.
+          base64 -d guess-the-speedrunner/patch-0.6.10-compact.tar.xz.b64 | xz -dc > /tmp/gts-0.6.10.tar
+          mkdir -p /tmp/gts-0.6.10
+          tar -xf /tmp/gts-0.6.10.tar -C /tmp/gts-0.6.10 CHANGES.diff
+          git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.10/CHANGES.diff
+          git apply --directory=guess-the-speedrunner /tmp/gts-0.6.10/CHANGES.diff
+          tar -xf /tmp/gts-0.6.10.tar --exclude=CHANGES.diff -C guess-the-speedrunner
+          grep -q 'mod_version=0.6.10' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -84,7 +92,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.9
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.10
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
