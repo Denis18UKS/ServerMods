@@ -40,6 +40,7 @@ jobs:
           sed -i 's/"OFF"),b->/"OFF")),b->/' guess-the-speedrunner/src/main/java/dev/zunserz/gts/client/VisualGuiEditorScreen.java
           base64 -d guess-the-speedrunner/patch-0.5.0.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.6.0.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
+          base64 -d guess-the-speedrunner/patch-0.6.0-fixes.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           grep -q 'mod_version=0.6.0' guess-the-speedrunner/gradle.properties
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
