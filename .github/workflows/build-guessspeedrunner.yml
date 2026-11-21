@@ -46,8 +46,8 @@ jobs:
           rm -f guess-the-speedrunner/src/main/java/dev/zunserz/gts/mixin/ExperienceHudMixin.java
           rm -f guess-the-speedrunner/src/main/java/dev/zunserz/gts/client/LevelTimer.java
           base64 -d guess-the-speedrunner/patch-0.6.1.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          base64 -d guess-the-speedrunner/patch-0.6.2.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          grep -q 'mod_version=0.6.2' guess-the-speedrunner/gradle.properties
+          # v0.6.3 is intentionally based on v0.6.1. Do not apply v0.6.2.\n          base64 -d guess-the-speedrunner/patch-0.6.3.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
+          grep -q 'mod_version=0.6.3' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -57,7 +57,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.2
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.3
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
