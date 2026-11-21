@@ -42,7 +42,12 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.6.0.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.6.0-fixes.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           base64 -d guess-the-speedrunner/patch-0.6.0-final.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
-          grep -q 'mod_version=0.6.0' guess-the-speedrunner/gradle.properties
+          # Older HUD Mixin must be removed: the 1.20.1 target method does not exist.
+          rm -f guess-the-speedrunner/src/main/java/dev/zunserz/gts/mixin/ExperienceHudMixin.java
+          rm -f guess-the-speedrunner/src/main/java/dev/zunserz/gts/client/LevelTimer.java
+          base64 -d guess-the-speedrunner/patch-0.6.1.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
+          grep -q 'mod_version=0.6.1' guess-the-speedrunner/gradle.properties
+          ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
       - name: Build Fabric mod
@@ -51,7 +56,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.0
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.1
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
