@@ -48,6 +48,7 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.6.1.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           # v0.6.3 is intentionally based on v0.6.1. Do not apply v0.6.2.
           base64 -d guess-the-speedrunner/patch-0.6.3.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
+          base64 -d guess-the-speedrunner/patch-0.6.3-fix1.tar.xz.b64 | tar -xJ -C guess-the-speedrunner
           grep -q 'mod_version=0.6.3' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
