@@ -64,6 +64,7 @@ jobs:
           base64 -d guess-the-speedrunner/patch-0.6.7.diff.xz.b64 | xz -dc > /tmp/gts-0.6.7.diff
           git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.7.diff
           git apply --directory=guess-the-speedrunner /tmp/gts-0.6.7.diff
+          (cd guess-the-speedrunner && python fix-0.6.7.py)
           grep -q 'mod_version=0.6.7' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
