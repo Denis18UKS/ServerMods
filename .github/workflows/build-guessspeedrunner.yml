@@ -82,7 +82,14 @@ jobs:
           git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.10/CHANGES.diff
           git apply --directory=guess-the-speedrunner /tmp/gts-0.6.10/CHANGES.diff
           tar -xf /tmp/gts-0.6.10.tar --exclude=CHANGES.diff -C guess-the-speedrunner
-          grep -q 'mod_version=0.6.10' guess-the-speedrunner/gradle.properties
+          # 0.6.11: restore saved layers around Craft; clear carried stacks, enable voting and termination.
+          base64 -d guess-the-speedrunner/patch-0.6.11.tar.xz.b64 | xz -dc > /tmp/gts-0.6.11.tar
+          mkdir -p /tmp/gts-0.6.11
+          tar -xf /tmp/gts-0.6.11.tar -C /tmp/gts-0.6.11 CHANGES.diff
+          git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.11/CHANGES.diff
+          git apply --directory=guess-the-speedrunner /tmp/gts-0.6.11/CHANGES.diff
+          tar -xf /tmp/gts-0.6.11.tar --exclude=CHANGES.diff -C guess-the-speedrunner
+          grep -q 'mod_version=0.6.11' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -92,7 +99,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.10
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.11
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
