@@ -90,7 +90,11 @@ jobs:
           git apply --directory=guess-the-speedrunner /tmp/gts-0.6.11/CHANGES.diff
           tar -xf /tmp/gts-0.6.11.tar --exclude=CHANGES.diff -C guess-the-speedrunner
           (cd guess-the-speedrunner && python apply-0.6.11-vote-fix.py)
-          grep -q 'mod_version=0.6.11' guess-the-speedrunner/gradle.properties
+          # v0.6.12: fixed 7 podiums after expulsions, separate spectator seat, no pearl throwing in Craft.
+          base64 -d guess-the-speedrunner/patch-0.6.12.diff.xz.b64 | xz -dc > /tmp/gts-0.6.12.diff
+          git apply --check --directory=guess-the-speedrunner /tmp/gts-0.6.12.diff
+          git apply --directory=guess-the-speedrunner /tmp/gts-0.6.12.diff
+          grep -q 'mod_version=0.6.12' guess-the-speedrunner/gradle.properties
           ! grep -q 'ExperienceHudMixin' guess-the-speedrunner/src/main/resources/gts.mixins.json
           test -f guess-the-speedrunner/src/main/resources/fabric.mod.json
           test -f guess-the-speedrunner/build.gradle
@@ -100,7 +104,7 @@ jobs:
       - name: Upload mod and source jars
         uses: actions/upload-artifact@v4
         with:
-          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.11
+          name: GuessTheSpeedrunner-Fabric-1.20.1-0.6.12
           path: |
             guess-the-speedrunner/build/libs/*.jar
           if-no-files-found: error
